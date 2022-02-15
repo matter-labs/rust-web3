@@ -93,10 +93,10 @@ async fn execute_rpc<T: DeserializeOwned>(client: &Client, url: Url, request: &R
         id,
         String::from_utf8_lossy(&response)
     );
-    if !status.is_success() {
-        return Err(Error::Transport(TransportError::Code(status.as_u16())));
-    }
     helpers::arbitrary_precision_deserialize_workaround(&response).map_err(|err| {
+        if !status.is_success() {
+            return Error::Transport(TransportError::Code(status.as_u16()));
+        }
         Error::Transport(TransportError::Message(format!(
             "failed to deserialize response: {}",
             err
